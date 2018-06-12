@@ -1,0 +1,38 @@
+1.初步了解nodejs中的fs和http模块
+
+2.了解get和post基本的使用方法
+
+const http = require('http');
+const fs = require('fs');
+const querystring = require('querystring');
+const urlLib = require('url');
+
+const server = http.createServer(function(req,res){
+	//GET
+	var obj = urlLib.parse(req.url,true);
+	var url = obj.pathname;
+	const GET = obj.query;
+
+	//POST
+	var str = '';
+	var i=0;
+	req.on('data',function(data){
+		console.log(`第${i++}次收到数据`);
+		str += data;
+	});
+	req.on('end',function(){
+		var POST = querystring.parse(str);
+			console.log(url,GET,POST)
+	});
+	var file_name = './www' + req.url;
+	fs.readFile(file_name,function(err,data){
+		if(err){
+			res.write('404');
+		}else{
+			res.write(data)
+		}
+		res.end();
+	});
+});
+
+server.listen(8017);
